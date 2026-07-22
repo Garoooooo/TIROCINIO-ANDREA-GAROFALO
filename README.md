@@ -2,13 +2,11 @@ Immagine Docker: Kathara con PyTorch
 
 Questa cartella contiene il Dockerfile utilizzato per creare l'immagine custom kathara-pytorch, pensata per eseguire script PyTorch all'interno dei laboratori di Kathara.
 
----
 
 Struttura della cartella
 
 Dockerfile: File di configurazione per la build dell'immagine base Kathara con Python e PyTorch (versione CPU).
 
----
 
 Come installare l'immagine locale
 
