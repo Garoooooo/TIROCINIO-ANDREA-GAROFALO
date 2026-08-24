@@ -12,4 +12,4 @@ Apri il terminale, posizionati nella cartella principale del laboratorio ed eseg
 
 #### Windows (PowerShell)
 ```powershell
-docker run --rm -v "${PWD}/shared:/shared" kathara-pytorch python3 -c "from torchvision import datasets; datasets.FashionMNIST(root='/shared/data', train=True, download=True); datasets.FashionMNIST(root='/shared/data', train=False, download=True)".
+docker run --rm -v "${PWD}/shared:/shared" kathara-pytorch python3 -c "from torchvision import datasets; datasets.FashionMNIST(root='/shared/data', train=True, download=True); datasets.FashionMNIST(root='/shared/data', train=False, download=True)"
