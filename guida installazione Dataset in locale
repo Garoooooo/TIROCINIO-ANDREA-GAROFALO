@@ -1,0 +1,15 @@
+# Download del Dataset FashionMNIST
+
+Per poter eseguire l'addestramento sui nodi virtuali senza problemi di connessione internet durante il laboratorio, il dataset FashionMNIST deve essere scaricato prima nella cartella `shared/data`.
+
+Questo comando usa direttamente l'immagine `kathara-pytorch` creata in precedenza per scaricare i file e metterli nella cartella corretta.
+
+
+
+### Come scaricarlo
+
+Apri il terminale, posizionati nella cartella principale del laboratorio ed esegui il comando:
+
+#### Windows (PowerShell)
+```powershell
+docker run --rm -v "${PWD}/shared:/shared" kathara-pytorch python3 -c "from torchvision import datasets; datasets.FashionMNIST(root='/shared/data', train=True, download=True); datasets.FashionMNIST(root='/shared/data', train=False, download=True)"
