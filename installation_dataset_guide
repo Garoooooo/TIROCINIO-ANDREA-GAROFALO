@@ -1,0 +1,13 @@
+# FashionMNIST Dataset Download
+
+To run training across virtual nodes without internet connectivity issues during the lab session, the FashionMNIST dataset must be downloaded in advance into the `shared/data` directory.
+
+This command directly leverages the previously built `kathara-pytorch` Docker image to download the required files and place them into the appropriate shared folder.
+
+### How to Download
+
+Open your terminal, navigate to the root directory of the lab project, and run:
+
+#### Windows (PowerShell)
+```powershell
+docker run --rm -v "${PWD}/shared:/shared" kathara-pytorch python3 -c "from torchvision import datasets; datasets.FashionMNIST(root='/shared/data', train=True, download=True); datasets.FashionMNIST(root='/shared/data', train=False, download=True)"
