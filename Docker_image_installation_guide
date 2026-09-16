@@ -1,0 +1,22 @@
+# Docker Image: kathara-pytorch
+
+Download the `Dockerfile` to create the custom Docker image `kathara-pytorch`.
+It is used to run Python scripts with PyTorch (CPU version) inside Kathara virtual devices without having to reinstall the libraries every time.
+
+---
+
+### What the image contains
+
+* Official Kathara base image (`kathara/base`)
+* Python 3 and Pip
+* PyTorch and Torchvision (CPU version)
+
+---
+
+### How to create the image on your PC
+
+To generate the image and make it available for Kathara labs:
+
+1. Open the terminal (or PowerShell) and move into this folder:
+   ```bash
+   cd path/to/the/folder
