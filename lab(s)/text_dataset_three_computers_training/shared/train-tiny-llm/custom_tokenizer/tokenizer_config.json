@@ -1,0 +1,42 @@
+{
+    "add_bos_token": false,
+    "add_eos_token": false,
+    "add_prefix_space": false,
+    "bos_token": "<s>",
+    "eos_token": "</s>",
+    "unk_token": "<unk>",
+    "pad_token": "<unk>",
+    "model_max_length": 32768,
+    "tokenizer_class": "PreTrainedTokenizerFast",
+    "clean_up_tokenization_spaces": false,
+    "additional_special_tokens": [],
+    "spaces_between_special_tokens": false,
+    "sp_model_kwargs": {},
+    "added_tokens_decoder": {
+        "0": {
+            "content": "<unk>",
+            "lstrip": false,
+            "normalized": false,
+            "rstrip": false,
+            "single_word": false,
+            "special": true
+        },
+        "1": {
+            "content": "<s>",
+            "lstrip": false,
+            "normalized": false,
+            "rstrip": false,
+            "single_word": false,
+            "special": true
+        },
+        "2": {
+            "content": "</s>",
+            "lstrip": false,
+            "normalized": false,
+            "rstrip": false,
+            "single_word": false,
+            "special": true
+        }
+    },
+    "chat_template": "{% if messages[0]['role'] == 'system' %}{% set system_message = messages[0]['content'] %}{{ '<s>system\\n' + system_message + '</s>\\n' }}{% else %}{{ '<s>system\\nYou are a helpful AI assistant.</s>\\n' }}{% endif %}{% for message in messages %}{% set content = message['content'] %}{% if message['role'] == 'user' %}{{ '<s>user\\n' + content + '</s>\\n<s>assistant\\n' }}{% elif message['role'] == 'assistant' %}{{ content + '</s>' + '\\n' }}{% endif %}{% endfor %}"
+}
