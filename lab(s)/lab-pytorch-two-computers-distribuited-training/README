@@ -48,7 +48,21 @@ Both scripts automatically track and print execution time, sent packets, and tot
 
 ---
 
-## 5. Stop the Lab
+## 5. Option C: Run Sync Every N Batches Training (Intermediate Approach)
+
+The script accepts `<RANK>` and `<SYNC_EVERY>` (ex. sync every 10 batches):
+
+On pc1 (Rank 0 - Master):
+python3 /shared/Train_Sync_N.py 0 10
+
+Immediately after, on pc2 (Rank 1):
+python3 /shared/Train_Sync_N.py 1 10
+
+Weights are averaged every N batches and at the end of each epoch. The script prints execution time, sent packets, and total transferred MB.
+
+---
+
+## 6. Stop the Lab
 
 When execution finishes, shut down the lab from the host terminal:
 
