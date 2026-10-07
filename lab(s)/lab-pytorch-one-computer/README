@@ -1,0 +1,36 @@
+# Single Node PyTorch Training (Kathara)
+## 1. Dataset Setup (Host PC)
+
+Download the FashionMNIST dataset locally before starting the lab (the container has no internet access):
+
+Save the downloaded files inside the shared folder:
+shared/data/FashionMNIST/raw/
+
+Make sure Train.py uses the absolute path to load the data:
+root="/shared/data"
+
+---
+
+## 2. Start the Lab Environment
+
+From the host command prompt (inside lab-pytorch-one-computer):
+
+kathara lstart
+
+---
+
+## 3. Run Training
+
+Open the pc1 terminal and run:
+
+python3 /shared/Train.py
+
+The model trains locally on CPU and prints the loss and evaluation metrics.
+
+---
+
+## 4. Stop the Lab
+
+When training finishes, shut down the container from the host terminal:
+
+kathara lclean
