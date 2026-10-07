@@ -4,7 +4,7 @@
 
 Convert raw text into the JSONL format required by the model:
 
-python converter_dataset.py
+py converter_dataset.py
 
 This reads raw text (e.g., input.txt or wiki_it.txt), slices it into chunks of 400 characters, and creates pretrain_data.jsonl.
 
@@ -49,10 +49,10 @@ http://localhost:3000
 
 ## 5. Launch Distributed Training (3 Nodes)
 
+The script accepts parameters: <RANK> <SYNC_EVERY> <WORLD_SIZE>.
+
 On pc1 (Rank 0 - Master):
 python3 /shared/train-tiny-llm/pretrain_distributed.py 0 10 3
-
-****<rank><n.batch><n.nodes>****
 
 Immediately after, on pc2 (Rank 1):
 python3 /shared/train-tiny-llm/pretrain_distributed.py 1 10 3
@@ -67,6 +67,8 @@ python3 /shared/train-tiny-llm/pretrain_distributed.py 2 10 3
 Copy the saved checkpoint back to your local repo (or point web_app.py to the shared folder) and run Streamlit:
 
 py -m streamlit run web_app.py
+
+Open browser at http://localhost:8501 to test text generation interactively.
 
 ---
 
