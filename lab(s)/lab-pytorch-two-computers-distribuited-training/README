@@ -1,0 +1,55 @@
+# Distributed PyTorch Training on 2 Nodes (Kathara)
+
+This lab runs distributed training on 2 virtual machines connected over a shared collision domain (A), comparing DDP against manual weight synchronization at the end of each epoch.
+
+## 1. Dataset Setup
+
+Place the pre-downloaded FashionMNIST dataset inside:
+shared/data/FashionMNIST/raw/
+
+Both machines access this data through the shared folder. DistributedSampler partitions 30,000 samples to each node.
+
+---
+
+## 2. Start the Lab and Wireshark
+
+From the host command prompt:
+
+kathara lstart
+
+Attach Wireshark to collision domain A:
+
+kathara lconfig -n wireshark --add A
+
+Open browser at:
+http://localhost:3000
+
+---
+
+## 3. Option A: Run DDP Training (Sync Every Batch)
+
+On pc1 (Rank 0 - Master):
+python3 /shared/Train_DDP.py 0
+
+Immediately after, on pc2 (Rank 1):
+python3 /shared/Train_DDP.py 1
+
+---
+
+## 4. Option B: Run Manual Sync Training (Sync at Epoch End)
+
+On pc1 (Rank 0 - Master):
+python3 /shared/Train_Sync_Manuale.py 0
+
+Immediately after, on pc2 (Rank 1):
+python3 /shared/Train_Sync_Manuale.py 1
+
+Both scripts automatically track and print execution time, sent packets, and total transferred MB.
+
+---
+
+## 5. Stop the Lab
+
+When execution finishes, shut down the lab from the host terminal:
+
+kathara lclean
