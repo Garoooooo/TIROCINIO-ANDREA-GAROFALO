@@ -1,13 +1,13 @@
 # Distributed PyTorch Training on 2 Nodes (Kathara)
 
-This lab runs distributed training on 2 virtual machines connected over a shared collision domain (A), comparing DDP against manual weight synchronization at the end of each epoch.
+This lab runs distributed training on 2 virtual machines connected over a shared collision domain (A), comparing DDP against manual weight synchronization at the end of each epoch[cite: 1, 2].
 
 ## 1. Dataset Setup
 
 Place the pre-downloaded FashionMNIST dataset inside:
 shared/data/FashionMNIST/raw/
 
-Both machines access this data through the shared folder. DistributedSampler partitions 30,000 samples to each node.
+Both machines access this data through the shared folder[cite: 1, 2]. DistributedSampler partitions 30,000 samples to each node[cite: 1, 2].
 
 ---
 
@@ -26,7 +26,22 @@ http://localhost:3000
 
 ---
 
-## 3. Option A: Run DDP Training (Sync Every Batch)
+## 3. Network Emulation: Packet Loss (Optional for Study)
+
+To simulate network degradation and observe TCP retransmissions during training, configure packet loss on pc2 before running any training option.
+
+Enable 5% packet loss on pc2 (run inside pc2 terminal):
+tc qdisc add dev eth0 root netem loss 5%
+
+Verify that packet loss is active:
+tc qdisc show dev eth0
+
+Remove packet loss and restore normal network conditions (run inside pc2 terminal):
+tc qdisc del dev eth0 root
+
+---
+
+## 4. Option A: Run DDP Training (Sync Every Batch)
 
 On pc1 (Rank 0 - Master):
 python3 /shared/Train_DDP.py 0
@@ -36,7 +51,7 @@ python3 /shared/Train_DDP.py 1
 
 ---
 
-## 4. Option B: Run Manual Sync Training (Sync at Epoch End)
+## 5. Option B: Run Manual Sync Training (Sync at Epoch End)
 
 On pc1 (Rank 0 - Master):
 python3 /shared/Train_Sync_Manuale.py 0
@@ -44,13 +59,13 @@ python3 /shared/Train_Sync_Manuale.py 0
 Immediately after, on pc2 (Rank 1):
 python3 /shared/Train_Sync_Manuale.py 1
 
-Both scripts automatically track and print execution time, sent packets, and total transferred MB.
+Both scripts automatically track and print execution time, sent packets, and total transferred MB[cite: 1, 2].
 
 ---
 
-## 5. Option C: Run Sync Every N Batches Training (Intermediate Approach)
+## 6. Option C: Run Sync Every N Batches Training (Intermediate Approach)
 
-The script accepts `<RANK>` and `<SYNC_EVERY>` (ex. sync every 10 batches):
+The script accepts `<RANK>` and `<SYNC_EVERY>` (ex. sync every 10 batches)[cite: 1, 2]:
 
 On pc1 (Rank 0 - Master):
 python3 /shared/Train_Sync_N.py 0 10
@@ -58,11 +73,11 @@ python3 /shared/Train_Sync_N.py 0 10
 Immediately after, on pc2 (Rank 1):
 python3 /shared/Train_Sync_N.py 1 10
 
-Weights are averaged every N batches and at the end of each epoch. The script prints execution time, sent packets, and total transferred MB.
+Weights are averaged every N batches and at the end of each epoch[cite: 1, 2]. The script prints execution time, sent packets, and total transferred MB[cite: 1, 2].
 
 ---
 
-## 6. Stop the Lab
+## 7. Stop the Lab
 
 When execution finishes, shut down the lab from the host terminal:
 
