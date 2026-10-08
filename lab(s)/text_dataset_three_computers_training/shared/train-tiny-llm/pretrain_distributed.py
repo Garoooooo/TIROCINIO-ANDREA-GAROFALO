@@ -13,7 +13,7 @@ from transformer.LMConfig import LMConfig
 from transformer.dataset import PretrainDataset
 
 
-# 1. Setup di rete: identico al tuo Train_Sync_N.py
+# Inizializzazione processo distribuito
 def setup(rank, world_size):
     os.environ['MASTER_ADDR'] = '192.168.1.10'
     os.environ['MASTER_PORT'] = '29500'
@@ -22,33 +22,31 @@ def setup(rank, world_size):
     print(f"--> [PC{rank + 1}] Connesso. Sync ogni {SYNC_EVERY} batch")
 
 
+# Chiusura gruppo distribuito
 def cleanup():
     dist.destroy_process_group()
 
 
-# 2. Cervello: al posto del tuo NeuralNetwork, il TransformerLM del repo
-# (il costruttore legge la config: dim=128, 4 livelli, finestre di 128 token, vocabolario 6400)
+# Creazione del modello
 def build_model():
     lm_config = LMConfig(dim=128, n_layers=4, max_seq_len=128)
     model = TransformerLM(lm_config)
     return model
 
 
-# 3. Media dei pesi tra i PC: identica al tuo Train_Sync_N.py
+# Sincronizzazione pesi via all-reduce
 def sync_weights(model, world_size):
     for param in model.parameters():
-        dist.all_reduce(param.data, op=dist.ReduceOp.SUM)  # sommo i pesi di tutti i PC
-        param.data /= world_size                           # divido per il numero di PC = media
+        dist.all_reduce(param.data, op=dist.ReduceOp.SUM)
+        param.data /= world_size
 
 
-# 4. Allenamento: stesso scheletro del tuo train(), cambia solo il calcolo della loss
-# (nel LLM: il dataset restituisce 3 cose (X, Y, loss_mask) e la loss e' mascherata sui padding)
+# Loop di training
 def train(dataloader, model, loss_fn, optimizer, rank, world_size):
     model.train()
     batch_count = 0
     for batch, (X, Y, loss_mask) in enumerate(dataloader):
         res = model(X)
-        # loss del repo: cross-entropy mascherata, identica concettualmente alla tua loss_fn(pred, y)
         loss_fct = nn.CrossEntropyLoss(reduction='none')
         raw = loss_fct(res.logits.view(-1, res.logits.size(-1)), Y.view(-1)).view(Y.size())
         loss = (raw * loss_mask).sum() / loss_mask.sum()
@@ -66,18 +64,18 @@ def train(dataloader, model, loss_fn, optimizer, rank, world_size):
             print(f"Loss: {loss.item():>7f}  [{batch + 1}/{len(dataloader)}]")
 
 
-# 5. Programma principale: stesso scheletro del tuo demo_basic()
+# Routine principale
 def demo_basic(rank, world_size):
     setup(rank, world_size)
 
-    # contatore di n pacchetti, dimensioni e tempi (uguale al tuo)
+    # Benchmark di rete iniziale
     start_time = time.time()
     with open('/sys/class/net/eth0/statistics/tx_bytes') as f:
         start_bytes = int(f.read())
     with open('/sys/class/net/eth0/statistics/tx_packets') as f:
         start_packets = int(f.read())
 
-    # DATASET: il PretrainDataset del repo
+    # Caricamento dataset e tokenizer
     tokenizer = AutoTokenizer.from_pretrained("/shared/train-tiny-llm/custom_tokenizer")
     training_data = PretrainDataset(
         "/shared/train-tiny-llm/pretrain_data.jsonl",
@@ -85,14 +83,17 @@ def demo_basic(rank, world_size):
         max_length=128
     )
 
+    # Configurazione dataloader distribuito
     batch_size = 8
     train_sampler = DistributedSampler(training_data, num_replicas=world_size, rank=rank)
     train_dataloader = DataLoader(training_data, batch_size=batch_size, sampler=train_sampler, num_workers=0)
 
+    # Inizializzazione pesi e ottimizzatore
     torch.manual_seed(42)
     model = build_model()
     optimizer = torch.optim.AdamW(model.parameters(), lr=5e-4)
 
+    # Ciclo epoche
     epochs = 1
     for t in range(epochs):
         train_sampler.set_epoch(t)
@@ -100,8 +101,9 @@ def demo_basic(rank, world_size):
             print(f"Epoch {t + 1}\n-------------------------------")
         train(train_dataloader, model, None, optimizer, rank, world_size)
 
-        sync_weights(model, world_size)  # sync a fine epoca
+        sync_weights(model, world_size)
 
+    # Salvataggio checkpoint e statistiche rete
     if rank == 0:
         torch.save(model.state_dict(), "/shared/train-tiny-llm/out/pretrain_distributed.pth")
         print("Saved PyTorch Model State to /shared/train-tiny-llm/out/pretrain_distributed.pth")
@@ -120,7 +122,7 @@ def demo_basic(rank, world_size):
     cleanup()
 
 
-# 6. Avvio da terminale: rank, SYNC_EVERY e WORLD_SIZE da riga di comando
+# avvio
 if __name__ == "__main__":
     if len(sys.argv) < 4:
         print("Uso: python3 /shared/train-tiny-llm/pretrain_distributed.py <RANK> <SYNC_EVERY> <WORLD_SIZE>")
